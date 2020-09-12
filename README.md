@@ -4,6 +4,8 @@
 
 Repositório voltado para a compreensão do uso do **AJAX** para consumo de dados através de **API externas**. No caso faremos 3 consultas à API do GitHub. E, ao longo da aula, aprenderemos a utilizar o **[Postman][Postman]**, uma das ferramenta para criação e consulta à APIs mais utilizadas (existem outras como o **[Insomnia][Insomnia]** também).
 
+Acesse [https://marcelo-diament.github.io/Github-API-with-AJAX/](https://marcelo-diament.github.io/Github-API-with-AJAX/) para visualizar o projeto no Github Pages.
+
 ___
 
 ## Introdução
