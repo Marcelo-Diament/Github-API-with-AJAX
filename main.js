@@ -73,4 +73,33 @@ window.onload = () => {
     return request
   }
 
+  /**
+   * @function getEmojis
+   * Retorna todos os emojis do Github e os imprime no front do nosso site
+   */
+  getEmojis = () => {
+    xhr = makeRequest();
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        clearAllDinamicContent();
+        emojis = JSON.parse(this.responseText);
+        let content = `<article class="emojis"><h2>emojis</h2><ul type="none" class="row">`;
+        for (prop in emojis) {
+          content += `
+            <li id="${prop}" class="col-6 col-sm-4 col-md-3 col-lg-2 my-3">
+              <div class="d-flex flex-column flex-nowrap justify-content-center align-items-center p-3 bg-light border rounded-lg">
+                <img src="${emojis[prop]}" width="50" height="50"/>
+                <small class="text-center mt-3 text-black-50 font-weight-bold">${prop}</small>
+              </div>
+            </li>
+          `;
+        }
+        content += '</ul></article>';
+        addContentAsHTML(githubEmojisContent, content);
+      }
+    };
+    xhr.open('GET', `https://api.github.com/emojis`, true);
+    xhr.send();
+  }
+
 }
