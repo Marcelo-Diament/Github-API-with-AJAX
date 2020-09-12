@@ -140,4 +140,44 @@ window.onload = () => {
     xhr.send();
   }
 
+  /**
+   * @function getUserRepos
+   * Retorna lista de repositórios do usuário de acordo com queryParams passados
+   * @param {String} username - Usuário proprietário dos repos a serem listados
+   * @param {String='all','public','private','forks','sources','member','internal'} [type='public'] - Tipo de repositórios a serem listados
+   * @param {String='full_name','created','updated','pushed'} [sort='updated'] - Parâmetro para ordenação
+   * @param {String='asc','desc'} [direction='desc'] - Ordenação ascendente ou descentende
+   * @param {Number} [per_page=10] - Número de repositórios por página
+   * @param {Number} [page=1] - Número de páginas
+   */
+  getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc', per_page = 10, page = 1) => {
+    xhr = makeRequest();
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        clearAllDinamicContent();
+        repos = JSON.parse(this.responseText);
+        let content = `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul type="none">`;
+        for (repo of repos) {
+          let createdAt = new Date(repo.created_at).toLocaleDateString();
+          let name = repo.name.replace(/-/g, ' ');
+          content += `
+            <li id="${repo.id}">
+            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório"
+            <div class="repo-item">
+                <h2>${name}</h2>
+                <small>Criado em ${createdAt}</small>
+                <!--<img src="" width="100" height="100"/>-->
+                <p>${repo.description}</p>
+              </div>
+            </li>
+          `;
+        }
+        content += '</ul></article>';
+        addContentAsHTML(reposContent, content);
+      }
+    };
+    xhr.open('GET', `https://api.github.com/users/${username}/repos?type=${type}&sort=${sort}&direction=${direction}&per_page=${per_page}&page=${page}`, true)
+    xhr.send()
+  }
+
 }
