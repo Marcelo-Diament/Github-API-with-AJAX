@@ -102,4 +102,42 @@ window.onload = () => {
     xhr.send();
   }
 
+  /**
+   * @function getUserInfos
+   * Retorna as informações do usuário Github
+   * @param {String} username - Nome de usuário no Github (exatamente como foi cadastrado)
+   * @returns - Retorna as informações do usuário (inclusive mais links que permitem novas requisições)
+   * @example - getUserInfos('Marcelo-Diament')
+   */
+  getUserInfos = username => {
+    xhr = makeRequest();
+    xhr.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        clearAllDinamicContent();
+        infos = JSON.parse(this.responseText);
+        let createdAt = new Date(infos.created_at).toLocaleDateString(),
+          updatedAt = new Date(infos.updated_at).toLocaleDateString(),
+          nome = infos.login.replace(/-/g, ' '),
+          bio = infos.bio,
+          avatar = infos.avatar_url;
+        let content = `
+          <img src="${avatar}" alt="Imagem de perfil do usuário ${nome}"
+          height="120" width="120" class="mr-2">
+          <div>
+            <h2>${nome}</h2>
+            <small>desde: ${createdAt} | última atualização: ${updatedAt}</small>
+          </div>
+          <div>
+            <p>${bio}</p>
+            <button id="btnUserRepos" class="btn btn-primary my-2"
+              onclick="getUserRepos(\'${nome.replace(' ', '-')}\');">Repositórios User GitHub</button>
+          </div>
+        `;
+        addContentAsHTML(userContent, content);
+      }
+    };
+    xhr.open('GET', `https://api.github.com/users/${username}`, true);
+    xhr.send();
+  }
+
 }
