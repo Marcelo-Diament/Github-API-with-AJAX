@@ -49,4 +49,28 @@ window.onload = () => {
   addContentAsHTML('main', reposContainer)
   let reposContent = '#reposContent';
 
+  /**
+   * @function makeRequest
+   * Cria uma nova requisição XMLHttpRequest
+   * @returns - Retorna a nova requisição
+   */
+  const makeRequest = () => {
+    if (window.XMLHttpRequest) { // Mozilla, Safari, ...
+      request = new XMLHttpRequest()
+    } else if (window.ActiveXObject) { // IE
+      try {
+        request = new ActiveXObject('Msxml2.XMLHTTP')
+      } catch (e) {
+        try {
+          request = new ActiveXObject('Microsoft.XMLHTTP')
+        } catch (e) {
+          console.error(e);
+          alert('Por favor, acesse esse site de um navegador mais recente');
+          return;
+        }
+      }
+    }
+    return request
+  }
+
 }
