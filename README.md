@@ -634,7 +634,6 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
             <div class="repo-item">
                 <h2>${name}</h2>
                 <small>Criado em ${createdAt}</small>
-                <!--<img src="" width="100" height="100"/>-->
                 <p>${repo.description}</p>
               </div>
             </li>
