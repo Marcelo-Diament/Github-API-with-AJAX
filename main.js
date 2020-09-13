@@ -176,94 +176,103 @@ window.onload = () => {
         }
         repos = JSON.parse(this.responseText);
         let content = '';
-        if (page === 1 && document.querySelector('#toastStyle') === null) {
-          let toastStyle = `<style id="toastStyle">.toast {transition: opacity 0.4s ease-in-out;}</style>`;
-          addContentAsHTML('head', toastStyle);
-        }
-        if (page === 1) {
+        if (repos.length > 0) {
+          if (page === 1 && document.querySelector('#toastStyle') === null) {
+            let toastStyle = `<style id="toastStyle">.toast {transition: opacity 0.4s ease-in-out;}</style>`;
+            addContentAsHTML('head', toastStyle);
+          }
+          if (page === 1) {
+            content += `
+              <article class="repos">
+                <h2>Repositórios de ${username.replace('-', ' ')}</h2>
+                <ul class="col-12 px-0 py-3 mx-0 my-3" type="none" id="reposList">`;
+          };
+          for (repo of repos) {
+            let createdAt = new Date(repo.created_at).toLocaleDateString();
+            let updatedAt = new Date(repo.updated_at).toLocaleDateString();
+            let name = repo.name.replace(/-/g, ' ');
+            content += `
+              <li id="${repo.id}" class="mt-3 mb-5">
+                <div class="repo-item">
+                  <h2>${name}</h2>
+            `;
+            if (repo.language !== null) {
+              content += `
+                  <span class="badge badge-pill badge-dark mt-0 mb-2 mr-2 py-1 px-2">${repo.language}</span>
+                  <br/>
+              `;
+            }
+            content += `
+                  <span class="badge badge-pill badge-light my-2 mr-2 py-1 px-2">Criado em ${createdAt}</span>
+                  <span class="badge badge-pill badge-light my-2 mr-2 py-1 px-2">Atualizado em ${updatedAt}</span>
+            `;
+            if (repo.description !== null) {
+              content += `
+                  <p>${repo.description}</p>
+              `;
+            }
+            content += `
+                </div>
+                <a id="btnRepo${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório ${name}">Ver Repositório</a>
+            `;
+            if (repo.clone_url !== null) {
+              let toast = `
+                <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast_${repo.id}" style="display:none;opacity:0;">
+                  <div class="toast-header">
+                    <strong class="mr-auto">git clone</strong>
+                    <small>Use o comando para clonar o repo</small>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:none;opacity:0;\';">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="toast-body bg-light">
+                    <code>git clone ${repo.clone_url}</code>
+                  </div>
+                </div>
+              `;
+              addContentAsHTML('#toastsContainer', toast);
+              content += `
+                <a id="btnRepoClone${repo.id}" href="#toast_${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:block;opacity:1;\';" title="Clonar o repositório ${name}">Clonar Repo</a>
+              `;
+            }
+            if (repo.homepage !== null) {
+              content += `
+                <a id="btnRepoHome${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.homepage}" target="_blank" rel="noopener noreferrer" title="Acessar o projeto ${name} online">Ver Projeto Online</a>
+              `;
+            }
+            content += `
+              </li>
+            `;
+          }
+          if (page === 1) {
+            content += `
+            </ul>
+            `;
+          }
+          if (page === 1) {
+            content += `
+              <a id="goToTop" class="btn btn-primary" href="#top" title="Subir para o topo">Topo</a>
+              <button id="nextRepos" onclick="getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, ${page + 1});" class="btn btn-primary">Próximos Repos</button>
+            </article>
+            `;
+          } else if (repos.length < 10) {
+            $('#nextRepos').removeAttribute('onclick');
+            $('#nextRepos').classList.add('disabled');
+          } else {
+            $('#nextRepos').setAttribute('onclick', onclick = `getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, ${page + 1});`);
+          }
+          if (page === 1) {
+            addContentAsHTML(reposContent, content);
+          } else {
+            addContentAsHTML('#reposList', content);
+          }
+        } else if (page === 1) {
           content += `
             <article class="repos">
-              <h2>Repositórios de ${username.replace('-', ' ')}</h2>
-              <ul class="col-12 px-0 py-3 mx-0 my-3" type="none" id="reposList">`;
-        };
-        for (repo of repos) {
-          let createdAt = new Date(repo.created_at).toLocaleDateString();
-          let updatedAt = new Date(repo.updated_at).toLocaleDateString();
-          let name = repo.name.replace(/-/g, ' ');
-          content += `
-            <li id="${repo.id}" class="mt-3 mb-5">
-              <div class="repo-item">
-                <h2>${name}</h2>
+              <h2>O usuário ${username.replace('-', ' ')} não possui repositórios</h2>
+            </article>
           `;
-          if (repo.language !== null) {
-            content += `
-                <span class="badge badge-pill badge-dark mt-0 mb-2 mr-2 py-1 px-2">${repo.language}</span>
-                <br/>
-            `;
-          }
-          content += `
-                <span class="badge badge-pill badge-light my-2 mr-2 py-1 px-2">Criado em ${createdAt}</span>
-                <span class="badge badge-pill badge-light my-2 mr-2 py-1 px-2">Atualizado em ${updatedAt}</span>
-          `;
-          if (repo.description !== null) {
-            content += `
-                <p>${repo.description}</p>
-            `;
-          }
-          content += `
-              </div>
-              <a id="btnRepo${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório ${name}">Ver Repositório</a>
-          `;
-          if (repo.clone_url !== null) {
-            let toast = `
-              <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast_${repo.id}" style="display:none;opacity:0;">
-                <div class="toast-header">
-                  <strong class="mr-auto">git clone</strong>
-                  <small>Use o comando para clonar o repo</small>
-                  <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:none;opacity:0;\';">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="toast-body bg-light">
-                  <code>git clone ${repo.clone_url}</code>
-                </div>
-              </div>
-            `;
-            addContentAsHTML('#toastsContainer', toast);
-            content += `
-              <a id="btnRepoClone${repo.id}" href="#toast_${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:block;opacity:1;\';" title="Clonar o repositório ${name}">Clonar Repo</a>
-            `;
-          }
-          if (repo.homepage !== null) {
-            content += `
-              <a id="btnRepoHome${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.homepage}" target="_blank" rel="noopener noreferrer" title="Acessar o projeto ${name} online">Ver Projeto Online</a>
-            `;
-          }
-          content += `
-            </li>
-          `;
-        }
-        if (page === 1) {
-          content += `
-          </ul>
-          `;
-        }
-        if (page === 1) {
-          content += `
-            <a id="goToTop" class="btn btn-primary" href="#top" title="Subir para o topo">Topo</a>
-            <button id="nextRepos" onclick="getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, ${page + 1});" class="btn btn-primary">Próximos Repos</button>
-          </article>
-          `;
-        } else if (repos.length < 10) {
-          $('#nextRepos').removeAttribute('onclick');
-          $('#nextRepos').classList.add('disabled');
-        } else {
-          $('#nextRepos').setAttribute('onclick', onclick = `getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, ${page + 1});`);
-        }
-        if (page === 1) {
           addContentAsHTML(reposContent, content);
-        } else {
-          addContentAsHTML('#reposList', content);
         }
       }
     }
