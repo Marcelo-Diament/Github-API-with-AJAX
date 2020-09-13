@@ -573,12 +573,18 @@ getUserInfos = username => {
             let content = `
           <img src="${avatar}" alt="Imagem de perfil do usuário ${nome}"
           height="120" width="120" class="rounded-circle mx-auto ml-md-0 mr-md-2 border-primary">
-          <div class="col-12 col-md-10 mt-5 mt-md-3 col-md-auto ml-md-2 ml-md-auto px-0">
+          <div class="col-12 col-md-10 mt-5 mt-md-3 ml-md-2 ml-md-auto px-0">
             <h2>${nome}</h2>
             <small>desde: ${createdAt} | última atualização: ${updatedAt}</small>
           </div>
-          <div class="col-12 col-md-auto my-3 px-0 d-flex flex-column">
+          <div class="col-12 my-3 px-0 d-flex flex-column">
+        `;
+            if (bio !== null) {
+                content = `
             <p class="col-12 px-0 my-2 order-0 order-md-2">${bio}</p>
+          `;
+            }
+            content += `
             <button id="btnUserRepos" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3"
               onclick="getUserRepos(\'${nome.replace(' ', '-')}\');">Repositórios User GitHub</button>
           </div>
@@ -636,6 +642,14 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
         if (this.readyState == 4 && this.status == 200) {
             clearAllDinamicContent();
             repos = JSON.parse(this.responseText);
+            let toastStyle = `
+              <style>
+                .toast {
+                  transition: opacity 0.4s ease-in-out;
+                }
+              </style>
+            `;
+            addContentAsHTML('body', toastStyle);
             let content = `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul class="col-12 px-0 py-3 mx-0 my-3" type="none">` ;
             for (repo of repos) {
                 let createdAt = new Date(repo.created_at).toLocaleDateString();
@@ -664,31 +678,23 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
               <a id="btnRepo${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório ${name}">Ver Repositório</a>
             `;
                 if (repo.clone_url !== null) {
-                    let toastStyle = `
-              <style>
-                .toast {
-                  transition: opacity 0.4s ease-in-out;
-                }
-              </style>
-            `;
-                    addContentAsHTML('body', toastStyle);
                     let toast = `
               <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast_${repo.id}" style="display:none;opacity:0;">
                 <div class="toast-header">
-                  <strong class="mr-auto">Clone</strong>
+                  <strong class="mr-auto">git clone</strong>
                   <small>Use o comando para clonar o repo</small>
                   <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:none;opacity:0;\';">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="toast-body">
+                <div class="toast-body bg-light">
                   <code>git clone ${repo.clone_url}</code>
                 </div>
               </div>
             `;
                     addContentAsHTML('#toastsContainer', toast);
                     content += `
-                <a id="btnRepoClone${repo.id}" href="#" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:block;opacity:1;\';" title="Clonar o repositório ${name}">Clonar Repo</a>
+                <a id="btnRepoClone${repo.id}" href="#toast_${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:block;opacity:1;\';" title="Clonar o repositório ${name}">Clonar Repo</a>
             `;
                 }
                 if (repo.homepage !== null) {
