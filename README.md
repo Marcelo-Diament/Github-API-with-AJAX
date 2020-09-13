@@ -449,7 +449,7 @@ getEmojis = () => {
         if (this.readyState == 4 && this.status == 200) {
             clearAllDinamicContent();
             emojis = JSON.parse(this.responseText);
-            let content = `<article class="emojis"><h2>emojis</h2><ul type="none" class="row">` ;
+            let content = `<article class="emojis"><h2>emojis</h2><ul type="none" class="row col-12 px-0 py-3 mx-0">` ;
             for (prop in emojis) {
                 content += `
             <li id="${prop}" class="col-6 col-sm-4 col-md-3 col-lg-2 my-3">
@@ -560,14 +560,14 @@ getUserInfos = username => {
                 avatar = infos.avatar_url;
             let content = `
           <img src="${avatar}" alt="Imagem de perfil do usuário ${nome}"
-          height="120" width="120" class="mr-2">
-          <div>
+          height="120" width="120" class="rounded-circle mx-auto ml-md-0 mr-md-2 border-primary">
+          <div class="col-12 col-md-10 mt-5 mt-md-3 col-md-auto ml-md-2 ml-md-auto px-0">
             <h2>${nome}</h2>
             <small>desde: ${createdAt} | última atualização: ${updatedAt}</small>
           </div>
-          <div>
-            <p>${bio}</p>
-            <button id="btnUserRepos" class="btn btn-primary my-2"
+          <div class="col-12 col-md-auto my-3 px-0 d-flex flex-column">
+            <p class="col-12 px-0 my-2 order-0 order-md-2">${bio}</p>
+            <button id="btnUserRepos" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3"
               onclick="getUserRepos(\'${nome.replace(' ', '-')}\');">Repositórios User GitHub</button>
           </div>
         `;
@@ -624,12 +624,12 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
         if (this.readyState == 4 && this.status == 200) {
             clearAllDinamicContent();
             repos = JSON.parse(this.responseText);
-            let content = `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul type="none">` ;
+            let content = `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul class="col-12 px-0 py-3 mx-0 my-3" type="none">` ;
             for (repo of repos) {
                 let createdAt = new Date(repo.created_at).toLocaleDateString();
                 let name = repo.name.replace(/-/g, ' ');
                 content += `
-            <li id="${repo.id}">
+            <li id="${repo.id}" class="mt-3 mb-5">
             <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório"
             <div class="repo-item">
                 <h2>${name}</h2>
@@ -650,7 +650,11 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
 
 ___
 
-### ![cheers](https://github.githubassets.com/images/icons/emoji/unicode/1f942.png?v8) _And that's all folks!_
+### 
+
+![cheers](https://github.githubassets.com/images/icons/emoji/unicode/1f942.png?v8)
+
+ _And that's all folks!_
 
 Se você leu esse documento até o final, está de parabéns! Programação é isso mesmo, muito estudo, prática, pesquisa, documentação... Mas vale todo o esforço!
 
