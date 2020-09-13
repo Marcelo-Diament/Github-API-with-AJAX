@@ -159,24 +159,47 @@ window.onload = () => {
         let content = `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul class="col-12 px-0 py-3 mx-0 my-3" type="none">`;
         for (repo of repos) {
           let createdAt = new Date(repo.created_at).toLocaleDateString();
+          let updatedAt = new Date(repo.updated_at).toLocaleDateString();
           let name = repo.name.replace(/-/g, ' ');
           content += `
             <li id="${repo.id}" class="mt-3 mb-5">
-            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório"
-            <div class="repo-item">
+              <div class="repo-item">
                 <h2>${name}</h2>
-                <small>Criado em ${createdAt}</small>
-                <p>${repo.description}</p>
-              </div>
-            </li>
+                `;
+          if (repo.language !== null) {
+            content += `
+              <span class="badge badge-pill badge-dark mt-0 mb-2 mr-2 py-1 px-2">${repo.language}</span>
+              <br/>
+            `;
+          }
+          content += `
+            <span class="badge badge-pill badge-light my-2 mr-2 py-1 px-2">Criado em ${createdAt}</span>
+            <span class="badge badge-pill badge-light my-2 mr-2 py-1 px-2">Atualizado em ${updatedAt}</span>
           `;
+          if (repo.description !== null) {
+            content += `<p>${repo.description}</p>`;
+          }
+          content += `
+              </div>
+              <a id="btnRepo${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório ${name}">Ver Repositório</a>
+            `;
+          if (repo.clone_url !== null) {
+            content += `
+                <a id="btnRepoClone${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.clone_url}" target="_blank" rel="noopener noreferrer" title="Clonar o repositório ${name}">Clonar Repo</a>
+            `;
+          }
+          if (repo.homepage !== null) {
+            content += `
+                <a id="btnRepoHome${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.homepage}" target="_blank" rel="noopener noreferrer" title="Acessar o projeto ${name} online">Ver Projeto Online</a>
+            `;
+          }
+          content += `</li>`;
         }
-        content += '</ul></article>';
+        content += `</ul></article>`;
         addContentAsHTML(reposContent, content);
       }
-    };
+    }
     xhr.open('GET', `https://api.github.com/users/${username}/repos?type=${type}&sort=${sort}&direction=${direction}&per_page=${per_page}&page=${page}`, true)
     xhr.send()
   }
-
 }
