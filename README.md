@@ -664,8 +664,31 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
               <a id="btnRepo${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.html_url}" target="_blank" rel="noopener noreferrer" title="Acessar o repositório ${name}">Ver Repositório</a>
             `;
                 if (repo.clone_url !== null) {
+                    let toastStyle = `
+              <style>
+                .toast {
+                  transition: opacity 0.4s ease-in-out;
+                }
+              </style>
+            `;
+                    addContentAsHTML('body', toastStyle);
+                    let toast = `
+              <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast_${repo.id}" style="display:none;opacity:0;">
+                <div class="toast-header">
+                  <strong class="mr-auto">Clone</strong>
+                  <small>Use o comando para clonar o repo</small>
+                  <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:none;opacity:0;\';">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="toast-body">
+                  <code>git clone ${repo.clone_url}</code>
+                </div>
+              </div>
+            `;
+                    addContentAsHTML('#toastsContainer', toast);
                     content += `
-                <a id="btnRepoClone${repo.id}" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" href="${repo.clone_url}" target="_blank" rel="noopener noreferrer" title="Clonar o repositório ${name}">Clonar Repo</a>
+                <a id="btnRepoClone${repo.id}" href="#" class="btn btn-primary my-2 order-2 order-md-0 col-auto col-md-3" onclick="document.querySelector(\'#toast_${repo.id}\').style = \'display:block;opacity:1;\';" title="Clonar o repositório ${name}">Clonar Repo</a>
             `;
                 }
                 if (repo.homepage !== null) {
