@@ -83,13 +83,25 @@ window.onload = () => {
       if (this.readyState == 4 && this.status == 200) {
         clearAllDinamicContent();
         emojis = JSON.parse(this.responseText);
-        let content = `<article class="emojis"><h2>emojis</h2><ul type="none" class="row col-12 px-0 py-3 mx-0">`;
+        let content = `
+          <style>
+            .emoji-title {
+              text-overflow: ellipsis;
+              -webkit-line-clamp: 1;
+              overflow: hidden;
+              max-width: 100%;
+            }
+          </style>
+          <article class="emojis">
+            <h2>emojis</h2>
+            <ul type="none" class="row col-12 px-0 py-3 mx-0">
+        `;
         for (prop in emojis) {
           content += `
             <li id="${prop}" class="col-6 col-sm-4 col-md-3 col-lg-2 my-3">
               <div class="d-flex flex-column flex-nowrap justify-content-center align-items-center p-3 bg-light border rounded-lg">
                 <img src="${emojis[prop]}" width="50" height="50"/>
-                <small class="text-center mt-3 text-black-50 font-weight-bold">${prop}</small>
+                <small class="text-center mt-3 text-black-50 font-weight-bold emoji-title">${prop}</small>
               </div>
             </li>
           `;
