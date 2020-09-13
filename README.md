@@ -571,8 +571,7 @@ getUserInfos = username => {
                 bio = infos.bio,
                 avatar = infos.avatar_url;
             let content = `
-          <img src="${avatar}" alt="Imagem de perfil do usuário ${nome}"
-          height="120" width="120" class="rounded-circle mx-auto ml-md-0 mr-md-2 border-primary">
+          <img src="${avatar}" alt="Imagem de perfil do usuário ${nome}" height="120" width="120" class="rounded-circle mx-auto ml-md-0 mr-md-2 border-primary">
           <div class="col-12 col-md-10 mt-5 mt-md-3 ml-md-2 ml-md-auto px-0">
             <h2>${nome}</h2>
             <small>desde: ${createdAt} | última atualização: ${updatedAt}</small>
@@ -580,7 +579,7 @@ getUserInfos = username => {
           <div class="col-12 my-3 px-0 d-flex flex-column">
         `;
             if (bio !== null) {
-                content = `
+                content += `
             <p class="col-12 px-0 my-2 order-0 order-md-2">${bio}</p>
           `;
             }
@@ -640,17 +639,22 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
     xhr = makeRequest();
     xhr.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            clearAllDinamicContent();
+            page === 1 && clearAllDinamicContent();
             repos = JSON.parse(this.responseText);
-            let toastStyle = `
+            if (page === 1) {
+                let toastStyle = `
               <style>
                 .toast {
                   transition: opacity 0.4s ease-in-out;
                 }
               </style>
             `;
-            addContentAsHTML('body', toastStyle);
-            let content = `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul class="col-12 px-0 py-3 mx-0 my-3" type="none">` ;
+                addContentAsHTML('body', toastStyle);
+            }
+            let content = '';
+            if (page === 1) {
+                content += `<article class="repos"><h2>Repositórios de ${username.replace('-', ' ')}</h2><ul class="col-12 px-0 py-3 mx-0 my-3" type="none" id="reposList">` ;
+            };
             for (repo of repos) {
                 let createdAt = new Date(repo.created_at).toLocaleDateString();
                 let updatedAt = new Date(repo.updated_at).toLocaleDateString();
@@ -704,8 +708,24 @@ getUserRepos = (username, type = 'public', sort = 'updated', direction = 'desc',
                 }
                 content += `</li>` ;
             }
-            content += `</ul></article>` ;
-            addContentAsHTML(reposContent, content);
+            if (page === 1) {
+                content += `</ul>` ;
+            }
+            if (page > 1) {
+                content += `
+            <button id="firstRepos" onclick="getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, 1);" class="btn btn-primary">Primeira Página</button>  
+            <button id="prevRepos" onclick="getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, ${--page});" class="btn btn-primary">Repos Anteriores</button>
+          `;
+            }
+            content += `
+        <button id="nextRepos" onclick="getUserRepos('${username.replace(' ', '-')}', '${type}', '${sort}', '${direction}', ${per_page}, ${++page});" class="btn btn-primary">Próximos Repos</button>
+          </article>
+        `;
+            if (page === 1) {
+                addContentAsHTML(reposContent, content);
+            } else {
+                addContentAsHTML('#reposList', content);
+            }
         }
     }
     xhr.open('GET', `https://api.github.com/users/${username}/repos?type=${type}&sort=${sort}&direction=${direction}&per_page=${per_page}&page=${page}` , true)
