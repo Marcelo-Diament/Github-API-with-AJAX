@@ -589,6 +589,14 @@ getUserInfos = username => {
           </div>
         `;
             addContentAsHTML(userContent, content);
+        } else if (this.readyState == 4 && this.status != 200) {
+            clearAllDinamicContent();
+            let content = `
+          <article class="repos">
+            <h2>O usuário ${username.replace('-', ' ')} não existe</h2>
+          </article>
+        `;
+            addContentAsHTML(userContent, content);
         }
     };
     xhr.open('GET', `https://api.github.com/users/${username}` , true);
